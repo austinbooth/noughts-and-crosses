@@ -56,8 +56,9 @@ const RootStore = types
       self.turn = Turn.player1
 
       if (self.game_type === GameType.COMPUTER_DUMB) {
-        self.player1 = 'computer'
-        self.player2 = 'human'
+        const coinFlip = randomInt(2)
+        self.player1 = coinFlip ? 'computer' : 'human'
+        self.player2 = self.player1 === 'computer' ? 'human' : 'computer'
 
         if (self.player1 === 'computer') {
           computer_move()
