@@ -1,7 +1,6 @@
 import { types } from "mobx-state-tree"
 import { store } from './store'
 import { check3 } from '../util/check3'
-import { Turn } from './index'
 
 export enum SquareValues {
     X = 'X',
@@ -66,12 +65,6 @@ export const Square = types
       if (self.value === SquareValues.null) {
         self.value = value
         store.check_if_won_and_toggle_turn()
-        // const winner = check_if_won()
-        // if (winner) {
-        //   store.end_game()
-        // } else {
-        //   store.toggle_turn()
-        // }
       } else {
         console.error('Square has already been assigned a non-null value')
       }
