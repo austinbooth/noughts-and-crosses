@@ -1,7 +1,7 @@
-import { types } from "mobx-state-tree"
+import { types, applySnapshot } from "mobx-state-tree"
 import { Row, Rows, Turn, GameType } from './index'
 import { SquareValues } from './Square'
-import { Square } from './Square'
+import { Square, check_if_won } from './Square'
 
 const randomInt = (max: number) => Math.floor(Math.random() * max)
 
@@ -31,7 +31,7 @@ const RootStore = types
     player2: types.maybeNull(types.string)
   })
   .actions(self => ({
-    create_board: (side_length: number) => {
+    create_board: (side_length: number, new_board:string[][] = []) => {
       for (let i = 0; i < side_length; i++) {
         const row = Row.create()
         self.board.push(row)
@@ -40,28 +40,41 @@ const RootStore = types
           self.board[i].push(s)
         }
       }
-    },
-    toggle_turn: () => {
-      self.turn === Turn.player1 ? self.turn = Turn.player2 : self.turn = Turn.player1
-      if (store[self.turn] === 'computer') {
-        computer_move()
+      
+      if (new_board.length > 0) {
+        const newBoard = new_board.map((row:string[]) => row.map((value:string) => ({
+          value: value.length ===  0  ? SquareValues.null :
+                        value === 'X' ? SquareValues.X    : SquareValues.O
+        })))
+        applySnapshot(store.board, newBoard)
       }
     },
-    end_game: () => {
-      self.game_in_play = false
-      self.winner = self.turn
+    check_if_won_and_toggle_turn: () => {
+      const winner = check_if_won()
+      if (winner) {
+        self.game_in_play = false
+        self.winner = winner === 'X' ? Turn.player1 : Turn.player2
+      } else {
+        self.turn === Turn.player1 ? self.turn = Turn.player2 : self.turn = Turn.player1
+        if (self.game_in_play && store[self.turn] === 'computer') {
+          computer_move()
+        }
+      }
     },
     start_game: () => {
       self.game_in_play = true
       self.turn = Turn.player1
+      self.winner = null
 
-      if (self.game_type === GameType.COMPUTER_DUMB) {
-        const coinFlip = randomInt(2)
-        self.player1 = coinFlip ? 'computer' : 'human'
-        self.player2 = self.player1 === 'computer' ? 'human' : 'computer'
+      if (process.env.NODE_ENV !== 'test') {
+        if (self.game_type === GameType.COMPUTER_DUMB) {
+          const coinFlip = randomInt(2)
+          self.player1 = coinFlip ? 'computer' : 'human'
+          self.player2 = self.player1 === 'computer' ? 'human' : 'computer'
 
-        if (self.player1 === 'computer') {
-          computer_move()
+          if (self.player1 === 'computer') {
+            computer_move()
+          }
         }
       }
     },
@@ -70,7 +83,9 @@ const RootStore = types
         self.winner = null
         self.board = Rows.create()
     },
-    set_game_type: (game_type: GameType) => self.game_type = game_type
+    set_game_type: (game_type: GameType) => self.game_type = game_type,
+    stop_game: () => self.game_in_play = false,
+    set_turn: (turn: Turn) => self.turn = turn
   }))
 
 export const store = RootStore.create()

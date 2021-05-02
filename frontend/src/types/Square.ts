@@ -1,6 +1,7 @@
 import { types } from "mobx-state-tree"
 import { store } from './store'
 import { check3 } from '../util/check3'
+import { Turn } from './index'
 
 export enum SquareValues {
     X = 'X',
@@ -8,7 +9,7 @@ export enum SquareValues {
     null = ''
 }
 
-const get_rows = () => {
+export const get_rows = () => {
   const rows: SquareValues[][] = []
   store.board.forEach(row => {
       const values = row.map(square => square.value)
@@ -16,7 +17,7 @@ const get_rows = () => {
   })
   return rows
 }
-const get_columns = () => {
+export const get_columns = () => {
   const cols = []
   for (let i = 0; i < store.board.length; i++) {
     const col = []
@@ -28,7 +29,7 @@ const get_columns = () => {
   }
   return cols
 }
-const get_diagonals = () => {
+export const get_diagonals = () => {
   const left_diagonal = [], right_diagonal = []
   for (let i = 0; i < store.board.length; i++) {
     left_diagonal.push(store.board[i][i].value)
@@ -37,7 +38,7 @@ const get_diagonals = () => {
   return { left_diagonal, right_diagonal }
 }
 
-const check_if_won = () => {
+export const check_if_won = () => {
   const rows = get_rows()
   const cols = get_columns()
   const { left_diagonal, right_diagonal } = get_diagonals()
@@ -49,7 +50,7 @@ const check_if_won = () => {
     const line_result = !all_null ? check3(all_lines[i]) : false
 
     if (line_result) {
-      winner = store.turn
+      winner = line_result
       break
     }
   }
@@ -64,12 +65,13 @@ export const Square = types
     add_value(value: SquareValues) {
       if (self.value === SquareValues.null) {
         self.value = value
-        const winner = check_if_won()
-        if (winner) {
-          store.end_game()
-        } else {
-          store.toggle_turn()
-        }
+        store.check_if_won_and_toggle_turn()
+        // const winner = check_if_won()
+        // if (winner) {
+        //   store.end_game()
+        // } else {
+        //   store.toggle_turn()
+        // }
       } else {
         console.error('Square has already been assigned a non-null value')
       }
