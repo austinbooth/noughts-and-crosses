@@ -1,5 +1,6 @@
 import { store } from '../types/store'
 import { getSnapshot } from 'mobx-state-tree'
+import { get_diagonals, SquareValues } from '../types/Square'
 
 const callGameFunctions = (newBoard: string[][], displaySnapshots: boolean = false) => {
     const boardSideLength = newBoard[0].length
@@ -12,6 +13,27 @@ const callGameFunctions = (newBoard: string[][], displaySnapshots: boolean = fal
         console.log(getSnapshot(store))
     }
 }
+
+describe.only('Test get_diagonals', () => {
+    test('Correctly gets all diagonals from a given game board', () => {
+        const newBoard = [
+            [ 'O', 'X' ],
+            [ '', 'O' ],
+        ]
+        callGameFunctions(newBoard)
+        const diagonals = get_diagonals()
+        expect(diagonals.length).toEqual(6)
+        expect(diagonals).toEqual([
+            ['O'],
+            ['X',''],
+            ['O'],
+            ['X'],
+            ['O', 'O'],
+            ['']
+        ])
+    })
+    // test a few larger boards too
+})
 
 describe('Test whether the game has been won', () => {
     test('Not won', () => {
