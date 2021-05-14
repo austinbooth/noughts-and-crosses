@@ -1,6 +1,6 @@
 import { store } from '../types/store'
 import { getSnapshot } from 'mobx-state-tree'
-import { get_diagonals, SquareValues } from '../types/Square'
+import { get_diagonals } from '../types/Square'
 
 const callGameFunctions = (newBoard: string[][], displaySnapshots: boolean = false) => {
     const boardSideLength = newBoard[0].length
