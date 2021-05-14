@@ -33,12 +33,12 @@ export const get_diagonals = () => {
   
   for (let i = 0; i < (store.board.length * 2) - 1; i++) {
     const diag_left = [], diag_right = []
-    let offset = i - 1
+    let offset = i - (store.board.length - 1)
 
-    for (let i = 0; i < store.board.length; i++) {
-      const r = i + offset
-      const c_left_diagonal = i
-      const c_right_diagonal = store.board.length - 1 - i
+    for (let j = 0; j < store.board.length; j++) {
+      const r = j + offset
+      const c_left_diagonal = j
+      const c_right_diagonal = store.board.length - 1 - j
       if (r >= 0 && r < store.board.length) {
       diag_left.push(store.board[r][c_left_diagonal].value)
       diag_right.push(store.board[r][c_right_diagonal].value)
