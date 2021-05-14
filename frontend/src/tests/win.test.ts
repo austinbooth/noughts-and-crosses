@@ -125,6 +125,17 @@ describe('Test whether the game has been won', () => {
             [ 'X', '', '', 'X' ],
             [ '', '', '', '' ]
         ]
+        callGameFunctions(newBoard)
+        expect(store.winner).toEqual('player1')
+    })
+    test('Won by player 1 - unusual diagonal and entire diagonal not the same value', () => {
+        const newBoard = [
+            [ 'X', 'X', '', '', '' ],
+            [ 'O', '', 'X', '', '' ],
+            [ 'X', '', '', 'X', '' ],
+            [ '', '', '', 'O', '' ],
+            [ '', '', '', '', '' ]
+        ]
         callGameFunctions(newBoard, true)
         expect(store.winner).toEqual('player1')
     })
