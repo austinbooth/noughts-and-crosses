@@ -14,8 +14,8 @@ const callGameFunctions = (newBoard: string[][], displaySnapshots: boolean = fal
     }
 }
 
-describe.only('Test get_diagonals', () => {
-    test('Correctly gets all diagonals from a given game board', () => {
+describe.only('Test get_diagonals - correctly gets all diagonals from a given game board', () => {
+    test('2x2 board:', () => {
         const newBoard = [
             [ 'O', 'X' ],
             [ '', 'O' ],
@@ -32,7 +32,30 @@ describe.only('Test get_diagonals', () => {
             ['']
         ])
     })
-    // test a few larger boards too
+    
+    test('3x3 board:', () => {
+        const newBoard = [
+            [ 'O', '', 'O'],
+            [ 'X', 'O', 'X' ],
+            [ 'O', '', 'X' ],
+        ]
+        callGameFunctions(newBoard)
+        const diagonals = get_diagonals()
+        expect(diagonals.length).toEqual(10)
+        expect(diagonals).toEqual([
+            ['O'],
+            ['','X'],
+            ['O','O','O'],
+            ['X', ''],
+            ['X'],
+            ['O'],
+            ['','X'],
+            ['O','O','X'],
+            ['X',''],
+            ['O'],
+        ])
+    })
+    
 })
 
 describe('Test whether the game has been won', () => {
