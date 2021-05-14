@@ -55,6 +55,35 @@ describe.only('Test get_diagonals - correctly gets all diagonals from a given ga
             ['O'],
         ])
     })
+
+    test('4x4 board:', () => {
+        const newBoard = [
+            [ 'O', '', 'O', ''],
+            [ 'X', 'O', 'X', 'X' ],
+            [ 'O', '', 'X', 'O' ],
+            [ '' , 'X', 'O', '']
+        ]
+        callGameFunctions(newBoard)
+        const diagonals = get_diagonals()
+        expect(diagonals.length).toEqual(14)
+        expect(diagonals).toEqual([
+            ['O'],
+            ['','X'],
+            ['O','O','O'],
+            ['' ,'X','', ''],
+            ['X', 'X', 'X'],
+            ['O', 'O'],
+            [''],
+
+            [''],
+            ['O','X'],
+            ['','X','O'],
+            ['O', 'O', 'X', ''],
+            ['X', '', 'O'],
+            ['O', 'X'],
+            [''],
+        ])
+    })
     
 })
 
