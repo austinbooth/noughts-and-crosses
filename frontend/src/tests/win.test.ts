@@ -14,7 +14,7 @@ const callGameFunctions = (newBoard: string[][], displaySnapshots: boolean = fal
     }
 }
 
-describe.only('Test get_diagonals - correctly gets all diagonals from a given game board', () => {
+describe('Test get_diagonals - correctly gets all diagonals from a given game board', () => {
     test('2x2 board:', () => {
         const newBoard = [
             [ 'O', 'X' ],
