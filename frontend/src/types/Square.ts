@@ -56,7 +56,7 @@ export const get_diagonals = () => {
 export const check_if_won = () => {
   const rows = get_rows()
   const cols = get_columns()
-  const diagonals = get_diagonals()
+  const diagonals = get_diagonals().filter(diagonal => diagonal.length >= 3)
   const all_lines: SquareValues[][] = [...rows, ...cols, ...diagonals]
   let winner = null
   for (let i = 0; i < all_lines.length; i++) {
