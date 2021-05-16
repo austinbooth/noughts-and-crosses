@@ -1,5 +1,6 @@
 import { store } from '../types/store'
 import { getSnapshot } from 'mobx-state-tree'
+import { get_diagonals } from '../types/Square'
 
 const callGameFunctions = (newBoard: string[][], displaySnapshots: boolean = false) => {
     const boardSideLength = newBoard[0].length
@@ -12,6 +13,79 @@ const callGameFunctions = (newBoard: string[][], displaySnapshots: boolean = fal
         console.log(getSnapshot(store))
     }
 }
+
+describe('Test get_diagonals - correctly gets all diagonals from a given game board', () => {
+    test('2x2 board:', () => {
+        const newBoard = [
+            [ 'O', 'X' ],
+            [ '', 'O' ],
+        ]
+        callGameFunctions(newBoard)
+        const diagonals = get_diagonals()
+        expect(diagonals.length).toEqual(6)
+        expect(diagonals).toEqual([
+            ['O'],
+            ['X',''],
+            ['O'],
+            ['X'],
+            ['O', 'O'],
+            ['']
+        ])
+    })
+    
+    test('3x3 board:', () => {
+        const newBoard = [
+            [ 'O', '', 'O'],
+            [ 'X', 'O', 'X' ],
+            [ 'O', '', 'X' ],
+        ]
+        callGameFunctions(newBoard)
+        const diagonals = get_diagonals()
+        expect(diagonals.length).toEqual(10)
+        expect(diagonals).toEqual([
+            ['O'],
+            ['','X'],
+            ['O','O','O'],
+            ['X', ''],
+            ['X'],
+            ['O'],
+            ['','X'],
+            ['O','O','X'],
+            ['X',''],
+            ['O'],
+        ])
+    })
+
+    test('4x4 board:', () => {
+        const newBoard = [
+            [ 'O', '', 'O', ''],
+            [ 'X', 'O', 'X', 'X' ],
+            [ 'O', '', 'X', 'O' ],
+            [ '' , 'X', 'O', '']
+        ]
+        callGameFunctions(newBoard)
+        const diagonals = get_diagonals()
+        expect(diagonals.length).toEqual(14)
+        expect(diagonals).toEqual([
+            ['O'],
+            ['','X'],
+            ['O','O','O'],
+            ['' ,'X','', ''],
+            ['X', 'X', 'X'],
+            ['O', 'O'],
+            [''],
+
+            [''],
+            ['O','X'],
+            ['','X','O'],
+            ['O', 'O', 'X', ''],
+            ['X', '', 'O'],
+            ['O', 'X'],
+            [''],
+        ])
+    })
+    
+})
 
 describe('Test whether the game has been won', () => {
     test('Not won', () => {
@@ -50,6 +124,17 @@ describe('Test whether the game has been won', () => {
             [ 'O', '', 'X', '' ],
             [ 'X', '', '', 'X' ],
             [ '', '', '', '' ]
+        ]
+        callGameFunctions(newBoard)
+        expect(store.winner).toEqual('player1')
+    })
+    test('Won by player 1 - unusual diagonal and entire diagonal not the same value', () => {
+        const newBoard = [
+            [ 'X', 'X', '', '', '' ],
+            [ 'O', '', 'X', '', '' ],
+            [ 'X', '', '', 'X', '' ],
+            [ '', '', '', 'O', '' ],
+            [ '', '', '', '', '' ]
         ]
         callGameFunctions(newBoard, true)
         expect(store.winner).toEqual('player1')

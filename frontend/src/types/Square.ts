@@ -1,4 +1,4 @@
-import { types } from "mobx-state-tree"
+import { types, getSnapshot } from "mobx-state-tree"
 import { store } from './store'
 import { check3 } from '../util/check3'
 
@@ -30,18 +30,34 @@ export const get_columns = () => {
 }
 export const get_diagonals = () => {
   const left_diagonal = [], right_diagonal = []
-  for (let i = 0; i < store.board.length; i++) {
-    left_diagonal.push(store.board[i][i].value)
-    right_diagonal.push(store.board[i][store.board.length - 1 - i].value)
+  
+  for (let i = 0; i < (store.board.length * 2) - 1; i++) {
+    const diag_left = [], diag_right = []
+    let offset = i - (store.board.length - 1)
+
+    for (let j = 0; j < store.board.length; j++) {
+      const r = j + offset
+      const c_left_diagonal = j
+      const c_right_diagonal = store.board.length - 1 - j
+      if (r >= 0 && r < store.board.length) {
+      diag_left.push(store.board[r][c_left_diagonal].value)
+      diag_right.push(store.board[r][c_right_diagonal].value)
+      }
+    }
+    left_diagonal.push(diag_left)
+    right_diagonal.push(diag_right)
   }
-  return { left_diagonal, right_diagonal }
+  const all_diagonals = [...right_diagonal, ...left_diagonal]
+  console.log(all_diagonals)
+  return all_diagonals
+
 }
 
 export const check_if_won = () => {
   const rows = get_rows()
   const cols = get_columns()
-  const { left_diagonal, right_diagonal } = get_diagonals()
-  const all_lines: SquareValues[][] = [...rows, ...cols, left_diagonal, right_diagonal]
+  const diagonals = get_diagonals().filter(diagonal => diagonal.length >= 3)
+  const all_lines: SquareValues[][] = [...rows, ...cols, ...diagonals]
   let winner = null
   for (let i = 0; i < all_lines.length; i++) {
     const all_null = all_lines[i].every((value: string) => value === SquareValues.null)
