@@ -6,15 +6,7 @@ import { Square, check_if_won } from './Square'
 const randomInt = (max: number) => Math.floor(Math.random() * max)
 
 const getAllEmptySquares = () => {
-  const emptySquares = []
-  for (let i=0; i<store.board.length; i++) {
-    for (let j=0; j < store.board[i].length; j++) {
-      const square = store.board[i][j]
-      if (square.value === SquareValues.null) {
-        emptySquares.push(square)
-      }
-    }
-  }
+  const emptySquares = store.board.flatMap(row => row.filter(s => s.value === SquareValues.null))
   return emptySquares
 }
 
