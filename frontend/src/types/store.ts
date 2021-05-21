@@ -1,11 +1,11 @@
 import { types, applySnapshot } from "mobx-state-tree"
-import { Row, Rows, Turn, GameType } from './index'
+import { Row, Rows, Turn, GameType, Winner } from './index'
 import { SquareValues } from './Square'
 import { Square, check_if_won } from './Square'
 
 const randomInt = (max: number) => Math.floor(Math.random() * max)
 
-const computer_move = () => {  
+const getAllEmptySquares = () => {
   const emptySquares = []
   for (let i=0; i<store.board.length; i++) {
     for (let j=0; j < store.board[i].length; j++) {
@@ -15,6 +15,11 @@ const computer_move = () => {
       }
     }
   }
+  return emptySquares
+}
+
+const computer_move = () => {  
+  const emptySquares = getAllEmptySquares()
   const idx = randomInt(emptySquares.length)
   const square = emptySquares[idx]
   square.add_value(store.turn === Turn.player1 ? SquareValues.X : SquareValues.O)
@@ -25,7 +30,7 @@ const RootStore = types
     board: Rows,
     turn: types.maybeNull(types.enumeration<Turn>(Object.values(Turn))),
     game_in_play: false,
-    winner: types.maybeNull(types.enumeration<Turn>(Object.values(Turn))),
+    winner: types.maybeNull(types.enumeration<Winner>(Object.values(Winner))),
     game_type: GameType.COMPUTER_DUMB,
     player1: types.maybeNull(types.string),
     player2: types.maybeNull(types.string)
@@ -51,9 +56,17 @@ const RootStore = types
     },
     check_if_won_and_toggle_turn: () => {
       const winner = check_if_won()
+      // check if drawn
+      if (!winner) {
+        const emptySquares = getAllEmptySquares()
+        if (emptySquares.length === 0) {
+          self.game_in_play = false
+          self.winner = Winner.tie
+        }
+      }
       if (winner) {
         self.game_in_play = false
-        self.winner = winner === 'X' ? Turn.player1 : Turn.player2
+        self.winner = winner === 'X' ? Winner.player1 : Winner.player2
       } else {
         self.turn === Turn.player1 ? self.turn = Turn.player2 : self.turn = Turn.player1
         if (self.game_in_play && store[self.turn] === 'computer') {
