@@ -1,5 +1,4 @@
-import { types, applySnapshot, getSnapshot } from "mobx-state-tree"
-import { string } from "mobx-state-tree/dist/internal"
+import { types, applySnapshot } from "mobx-state-tree"
 import { Row, Rows, Turn, GameType, Winner } from './index'
 import { SquareValues } from './Square'
 import { Square, check_if_won } from './Square'
@@ -11,32 +10,11 @@ export const getAllEmptySquares = (board = store.board) => {
   return emptySquares
 }
 
-const encodeBoard = (board: Rows, maximisingPlayer: boolean) => {
-  let boardRepresentation = ''
-  board.forEach(row => {
-    row.forEach(square => {
-      if (square.value === SquareValues.null) {
-        boardRepresentation += '_'
-      } else {
-        boardRepresentation += square.value
-      }
-    })
-  })
-  if (maximisingPlayer) {
-    boardRepresentation += '-max'
-  } else {
-    boardRepresentation += '-min'
-  }
-  return boardRepresentation
-}
-
 const scoreLookup: {[index:string] : number} = {
   X: 10,
   tie: 0,
   O: -10,
 }
-
-const minimaxScores: {[index:string]: number} = {}
 
 const minimax = (board: Rows, depth: number, maximisingPlayer: boolean, alpha: number, beta: number):number => {
   const gameResult = check_if_won(board)
@@ -78,7 +56,7 @@ const minimax = (board: Rows, depth: number, maximisingPlayer: boolean, alpha: n
 }
 
 const computer_move = () => {
-  const emptySquares: Square[] = getAllEmptySquares(store.board)
+  let emptySquares: Square[] = getAllEmptySquares(store.board)
   // if (emptySquares.length === store.board.length ** 2) {
   //   console.log('NO MOVES YET...')
   //   store.board[0][0].add_value(SquareValues.X)
@@ -90,27 +68,49 @@ const computer_move = () => {
   let alpha = -Infinity, beta = Infinity
   let bestMove = Square.create({row: -1, column: -1, value: SquareValues.null})
 
-  emptySquares.forEach(square => {
-    square.add_value(store.turn === Turn.player1 ? SquareValues.X : SquareValues.O, false)
-    const score = minimax(store.board, 0, false, alpha, beta)
-    // const score = maximisingPlayer ? 1 : -1
-    square.remove_value()
-    // if (maximisingPlayer) {
-    //   if (score > best_score) {
-    //     best_score = score
-    //     bestMove = square
-    //   }
-    // } else {
-    //   if (score < best_score) {
-    //     best_score = score
-    //     bestMove = square
-    //   }
-    // }
-    if (score > best_score) {
-      best_score = score
-      bestMove = square
+  // check if can win in next move
+  const number_of_moves = (store.board.length ** 2) - emptySquares.length
+  if (number_of_moves >= 4) {
+    for (let i=0; i < emptySquares.length; i++) {
+      emptySquares[i].add_value(store.turn === Turn.player1 ? SquareValues.X : SquareValues.O, false)
+      const gameResult = check_if_won(store.board)
+      if (gameResult === SquareValues.X) {
+        bestMove = emptySquares[i]
+        emptySquares[i].remove_value()
+        break
+      }
+      emptySquares[i].remove_value()
     }
-  })
+  }
+
+  if (bestMove.row === -1 && bestMove.column === -1) {
+    for (let i=0; i < emptySquares.length; i++) {
+      emptySquares[i].add_value(store.turn === Turn.player1 ? SquareValues.X : SquareValues.O, false)
+      const score = minimax(store.board, 0, false, alpha, beta)
+      // const score = maximisingPlayer ? 1 : -1
+      emptySquares[i].remove_value()
+      // if (maximisingPlayer) {
+      //   if (score > best_score) {
+      //     best_score = score
+      //     bestMove = square
+      //   }
+      // } else {
+      //   if (score < best_score) {
+      //     best_score = score
+      //     bestMove = square
+      //   }
+      // }
+      if (score > best_score) {
+        best_score = score
+        bestMove = emptySquares[i]
+      }
+      if (best_score >= 6) {
+        console.log('breaking early...')
+        break
+      }
+    }
+  }
+  
   const best_row = bestMove.row, best_col = bestMove.column
   store.board[best_row][best_col].add_value(store.turn === Turn.player1 ? SquareValues.X : SquareValues.O)
 
