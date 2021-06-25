@@ -22,7 +22,7 @@ const minimax = (board: Rows, depth: number, maximisingPlayer: boolean, alpha: n
     const score = scoreLookup[gameResult]
     return score
   }
-  if (depth === 4) return 0 // so recursion doesn't take too long and hang
+  if (depth === 4) return 0 // so recursion doesn't take a very long time
   const emptySquares: Square[] = getAllEmptySquares(board)
   let bestScore = maximisingPlayer ? -Infinity : Infinity
   if (maximisingPlayer) {
@@ -57,14 +57,16 @@ const minimax = (board: Rows, depth: number, maximisingPlayer: boolean, alpha: n
 
 const computer_move = () => {
   let emptySquares: Square[] = getAllEmptySquares(store.board)
-  // if (emptySquares.length === store.board.length ** 2) {
-  //   console.log('NO MOVES YET...')
-  //   store.board[0][0].add_value(SquareValues.X)
-  //   return
-  // }
-  // const maximisingPlayer = store.turn === Turn.player1
-  const maximisingPlayer = true
+  if (emptySquares.length === store.board.length ** 2) {
+    console.log('NO MOVES YET...')
+    const position = store.board.length === 3 ? 0 : 1
+    store.board[position][position].add_value(SquareValues.X)
+    return
+  }
+  const maximisingPlayer = store.turn === Turn.player1
+  console.log('Maximising player:', maximisingPlayer)
   let best_score = maximisingPlayer ? -Infinity : Infinity
+  console.log('Initialising best_score:', best_score)
   let alpha = -Infinity, beta = Infinity
   let bestMove = Square.create({row: -1, column: -1, value: SquareValues.null})
 
@@ -74,7 +76,7 @@ const computer_move = () => {
     for (let i=0; i < emptySquares.length; i++) {
       emptySquares[i].add_value(store.turn === Turn.player1 ? SquareValues.X : SquareValues.O, false)
       const gameResult = check_if_won(store.board)
-      if (gameResult === SquareValues.X) {
+      if ((maximisingPlayer && gameResult === SquareValues.X) || (!maximisingPlayer && gameResult === SquareValues.O)) {
         bestMove = emptySquares[i]
         emptySquares[i].remove_value()
         break
@@ -83,43 +85,41 @@ const computer_move = () => {
     }
   }
 
-  if (bestMove.row === -1 && bestMove.column === -1) {
     for (let i=0; i < emptySquares.length; i++) {
       emptySquares[i].add_value(store.turn === Turn.player1 ? SquareValues.X : SquareValues.O, false)
-      const score = minimax(store.board, 0, false, alpha, beta)
+      const score = minimax(store.board, 0, !maximisingPlayer, alpha, beta)
+      console.log('Maximising player:', maximisingPlayer, 'Score from minimax:', score)
       // const score = maximisingPlayer ? 1 : -1
       emptySquares[i].remove_value()
-      // if (maximisingPlayer) {
-      //   if (score > best_score) {
-      //     best_score = score
-      //     bestMove = square
-      //   }
-      // } else {
-      //   if (score < best_score) {
-      //     best_score = score
-      //     bestMove = square
-      //   }
-      // }
-      if (score > best_score) {
-        best_score = score
-        bestMove = emptySquares[i]
+      if (maximisingPlayer) {
+        if (score > best_score) {
+          best_score = score
+          bestMove = emptySquares[i]
+        }
+      } else {
+        if (score < best_score) {
+          console.log('Re-assigning best_score:', score)
+          best_score = score
+          bestMove = emptySquares[i]
+        }
       }
-      if (best_score >= 6) {
+      if (!maximisingPlayer) console.log('Best score:', best_score)
+      if ((maximisingPlayer && best_score >= 7) || (!maximisingPlayer && best_score <= -7)) {
         console.log('breaking early...')
         break
       }
     }
-  }
   
   const best_row = bestMove.row, best_col = bestMove.column
   store.board[best_row][best_col].add_value(store.turn === Turn.player1 ? SquareValues.X : SquareValues.O)
+}
 
-  
-  // console.log('RANDOM MOVE...')
-  // const emptySquares = getAllEmptySquares()
-  // const idx = randomInt(emptySquares.length)
-  // const square = emptySquares[idx]
-  // square.add_value(store.turn === Turn.player1 ? SquareValues.X : SquareValues.O)
+const random_move = () => {
+  console.log('RANDOM MOVE...')
+  const emptySquares = getAllEmptySquares()
+  const idx = randomInt(emptySquares.length)
+  const square = emptySquares[idx]
+  square.add_value(store.turn === Turn.player1 ? SquareValues.X : SquareValues.O)
 }
 
 const RootStore = types
@@ -186,10 +186,11 @@ const RootStore = types
       if (process.env.NODE_ENV !== 'test') {
         if (self.game_type === GameType.COMPUTER_DUMB) {
           const coinFlip = randomInt(2)
-          // self.player1 = coinFlip ? 'computer' : 'human'
-          // self.player2 = self.player1 === 'computer' ? 'human' : 'computer'
-          self.player1 = 'computer'
-          self.player2 = 'human'
+          console.log('Coin flip:', coinFlip)
+          self.player1 = coinFlip ? 'computer' : 'human'
+          self.player2 = self.player1 === 'computer' ? 'human' : 'computer'
+          // self.player1 = 'computer'
+          // self.player2 = 'human'
 
           if (self.player1 === 'computer') {
             computer_move()
