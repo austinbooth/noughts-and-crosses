@@ -13,9 +13,11 @@ const App = observer(props => {
 
   const [data, setData] = useState('')
 
-  useEffect(() => {
+  useEffect((): () => void => {
     const socket = socketIOClient(ENDPOINT)
     socket.on("FromServer", data => setData(data))
+
+    return () => socket.disconnect();
   }, [])
 
   return (
