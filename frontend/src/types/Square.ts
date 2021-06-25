@@ -1,6 +1,7 @@
-import { types, getSnapshot } from "mobx-state-tree"
-import { store } from './store'
+import { types, getSnapshot, Instance } from "mobx-state-tree"
+import { store, getAllEmptySquares } from './store'
 import { check3 } from '../util/check3'
+import { Rows } from '../types/'
 
 export enum SquareValues {
     X = 'X',
@@ -8,57 +9,57 @@ export enum SquareValues {
     null = ''
 }
 
-export const get_rows = () => {
+export const get_rows = (board: Rows) => {
   const rows: SquareValues[][] = []
-  store.board.forEach(row => {
+  board.forEach(row => {
       const values = row.map(square => square.value)
       rows.push(values)
   })
   return rows
 }
-export const get_columns = () => {
+export const get_columns = (board: Rows) => {
   const cols = []
-  for (let i = 0; i < store.board.length; i++) {
+  for (let i = 0; i < board.length; i++) {
     const col = []
-    for (let j = 0; j < store.board.length; j++) {
-      const value = store.board[j][i].value
+    for (let j = 0; j < board.length; j++) {
+      const value = board[j][i].value
       col.push(value)
     }
     cols.push(col)
   }
   return cols
 }
-export const get_diagonals = () => {
+export const get_diagonals = (board: Rows) => {
   const left_diagonal = [], right_diagonal = []
   
-  for (let i = 0; i < (store.board.length * 2) - 1; i++) {
+  for (let i = 0; i < (board.length * 2) - 1; i++) {
     const diag_left = [], diag_right = []
-    let offset = i - (store.board.length - 1)
+    let offset = i - (board.length - 1)
 
-    for (let j = 0; j < store.board.length; j++) {
+    for (let j = 0; j < board.length; j++) {
       const r = j + offset
       const c_left_diagonal = j
-      const c_right_diagonal = store.board.length - 1 - j
-      if (r >= 0 && r < store.board.length) {
-      diag_left.push(store.board[r][c_left_diagonal].value)
-      diag_right.push(store.board[r][c_right_diagonal].value)
+      const c_right_diagonal = board.length - 1 - j
+      if (r >= 0 && r < board.length) {
+      diag_left.push(board[r][c_left_diagonal].value)
+      diag_right.push(board[r][c_right_diagonal].value)
       }
     }
     left_diagonal.push(diag_left)
     right_diagonal.push(diag_right)
   }
   const all_diagonals = [...right_diagonal, ...left_diagonal]
-  console.log(all_diagonals)
+  // console.log(all_diagonals)
   return all_diagonals
 
 }
 
-export const check_if_won = () => {
-  const rows = get_rows()
-  const cols = get_columns()
-  const diagonals = get_diagonals().filter(diagonal => diagonal.length >= 3)
+export const check_if_won = (board = store.board) => {
+  const rows = get_rows(board)
+  const cols = get_columns(board)
+  const diagonals = get_diagonals(board).filter(diagonal => diagonal.length >= 3)
   const all_lines: SquareValues[][] = [...rows, ...cols, ...diagonals]
-  let winner = null
+  let winner = ''
   for (let i = 0; i < all_lines.length; i++) {
     const all_null = all_lines[i].every((value: string) => value === SquareValues.null)
 
@@ -69,20 +70,32 @@ export const check_if_won = () => {
       break
     }
   }
+  if (!winner) {
+    const emptySquares = getAllEmptySquares()
+    if (emptySquares.length === 0) {
+      winner = 'tie'
+    }
+  }
   return winner
 }
 
 export const Square = types
   .model({
+    row: types.number,
+    column: types.number,
     value: types.enumeration<SquareValues>(Object.values(SquareValues))
   })
   .actions(self => ({
-    add_value(value: SquareValues) {
+    add_value(value: SquareValues, check_if_won = true) {
       if (self.value === SquareValues.null) {
         self.value = value
-        store.check_if_won_and_toggle_turn()
+        if (check_if_won) store.check_if_won_and_toggle_turn()
       } else {
         console.error('Square has already been assigned a non-null value')
       }
+    },
+    remove_value() {
+      self.value = SquareValues.null
     }
   }))
+export type Square = Instance<typeof Square>
