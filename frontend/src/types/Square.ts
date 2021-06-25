@@ -29,7 +29,7 @@ export const get_columns = (board: Rows) => {
   }
   return cols
 }
-export const get_diagonals = (board: Rows) => {
+export const get_diagonals = (board: Rows = store.board) => {
   const left_diagonal = [], right_diagonal = []
   
   for (let i = 0; i < (board.length * 2) - 1; i++) {
