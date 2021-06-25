@@ -12,3 +12,14 @@ services:
       - "/noc/node_modules"
     ports:
       - "8080:3000"
+  server:
+    build:
+      context: ./server
+      dockerfile: ../server.Dockerfile
+    stdin_open: true
+    tty: true
+    volumes:
+      - "./server:/noc_server"
+      - "/noc_server/node_modules"
+    ports:
+      - "9090:9090"
