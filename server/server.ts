@@ -9,10 +9,24 @@ const PORT = 9090;
 
 app.get('/', (req, res) => res.send('Noughts and crosses game server'));
 
+let interval: NodeJS.Timeout
 io.on('connection', (socket: typeof Socket) => {
-  console.log('a user connected');
+  console.log('New client connected');
+  if (interval) {
+    clearInterval(interval);
+  }
+  interval = setInterval(() => emit(socket), 1000);
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+    clearInterval(interval);
+  });
 });
 
-server.listen(PORT, () => {
+const emit = (socket: typeof Socket) => {
+  const response = Date.now();
+  socket.emit("FromServer", response);
+};
+
+server.listen(process.env.PORT || PORT, () => {
   console.log(`[server]: Server is running at https://localhost:${PORT}`);
 });
