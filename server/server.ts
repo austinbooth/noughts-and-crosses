@@ -2,9 +2,22 @@ import express from 'express';
 const http = require('http');
 const { Server, Socket } = require("socket.io");
 
+
+// const io = require("socket.io")(httpServer, {
+//   cors: {
+//     origin: "https://example.com",
+//     methods: ["GET", "POST"]
+//   }
+// });
+
+
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:8080",
+    methods: ["GET", "POST"]
+  }});
 const PORT = 9090;
 
 app.get('/', (req, res) => res.send('Noughts and crosses game server'));
