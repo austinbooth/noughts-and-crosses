@@ -12,6 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "mobx": "^6.3.2",
+    "mobx-state-tree": "^5.0.2",
     "socket.io": "^4.1.2"
   },
   "devDependencies": {

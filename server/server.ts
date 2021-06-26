@@ -1,16 +1,8 @@
 import express from 'express';
+import { store } from './types/store'
+
 const http = require('http');
 const { Server, Socket } = require("socket.io");
-
-
-// const io = require("socket.io")(httpServer, {
-//   cors: {
-//     origin: "https://example.com",
-//     methods: ["GET", "POST"]
-//   }
-// });
-
-
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
