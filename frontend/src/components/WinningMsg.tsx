@@ -1,5 +1,5 @@
 import { store } from '../types/store'
-import { Winner } from '../types'
+import { Winner } from '../../common'
 
 export const WinningMsg = () => {
     return (

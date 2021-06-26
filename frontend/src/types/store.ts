@@ -1,7 +1,6 @@
 import { types, applySnapshot } from "mobx-state-tree"
-import { Row, Rows, Turn, GameType, Winner } from './index'
-import { SquareValues } from './Square'
-import { Square, check_if_won } from './Square'
+import { Row, Rows, Turn, GameType, Winner } from '../../common/index'
+import { SquareValues, Square, check_if_won } from '../../common/Square'
 
 const randomInt = (max: number) => Math.floor(Math.random() * max)
 
