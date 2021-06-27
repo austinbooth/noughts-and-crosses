@@ -1,7 +1,8 @@
-import { types, applySnapshot } from "mobx-state-tree"
-import { Row, Rows, Turn, GameType, Winner, Game } from '../common'
+import { types, applySnapshot, Instance } from "mobx-state-tree"
+import { Turn, Winner, GameBase } from '../common'
+import { Row, Rows, GameType } from '../types'
 import { SquareValues } from '../common/Square'
-import { Square, check_if_won } from '../types/Square'
+import { Square, check_if_won } from './Square'
 
 const randomInt = (max: number) => Math.floor(Math.random() * max)
 
@@ -23,7 +24,7 @@ const minimax = (board: Rows, depth: number, maximisingPlayer: boolean, alpha: n
     return score
   }
   if (depth === 4) return 0 // so recursion doesn't take a very long time
-  const emptySquares: Square[] = getAllEmptySquares(board)
+  const emptySquares: Instance<Square>[] = getAllEmptySquares(board)
   let bestScore = maximisingPlayer ? -Infinity : Infinity
   if (maximisingPlayer) {
     for(let i=0; i<emptySquares.length; i++) {
@@ -56,7 +57,7 @@ const minimax = (board: Rows, depth: number, maximisingPlayer: boolean, alpha: n
 }
 
 const computer_move = () => {
-  let emptySquares: Square[] = getAllEmptySquares(store.board)
+  let emptySquares: Instance<Square>[] = getAllEmptySquares(store.board)
   if (emptySquares.length === store.board.length ** 2) {
     console.log('NO MOVES YET...')
     const position = store.board.length === 3 ? 0 : 1
@@ -122,9 +123,10 @@ const random_move = () => {
   square.add_value(store.turn === Turn.player1 ? SquareValues.X : SquareValues.O)
 }
 
-const RootStore = Game
+const RootStore = GameBase
   .named('StoreFrontend')
   .props({
+    board: Rows,
     game_type: GameType.COMPUTER_DUMB
   })
   .actions(self => ({

@@ -1,7 +1,8 @@
 import { types } from 'mobx-state-tree'
-import { Game } from '../common'
+import { Game } from '../types'
 
 export const Room = types.model({
+    id: types.string,
     user_1: types.string,
     user_2: types.maybe(types.string),
     connection_code: Date.now().toString().substr(-4),

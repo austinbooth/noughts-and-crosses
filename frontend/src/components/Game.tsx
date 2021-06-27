@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { store } from '../types/store'
 import { SquareComponent } from './Square'
 import { RowComponent } from './Row'
-import { Rows, Row } from '../common'
+import { Rows, Row } from '../types'
 import { SquareValues } from '../common/Square'
 import { Square } from '../types/Square'
 import { Turn } from '../common/index'
@@ -10,7 +10,7 @@ import { Instance } from 'mobx-state-tree'
 import { observer } from 'mobx-react-lite'
 
 interface Props {
-    board: Instance<typeof Rows>
+    board: Instance<Rows>
 }
 
 export const Game: FC<Props> = observer(({ board }) => {
@@ -23,7 +23,7 @@ export const Game: FC<Props> = observer(({ board }) => {
     }
     return (
         <>
-            {board.map((row: Instance<typeof Row>, row_idx: number) => (
+            {board.map((row: Instance<Row>, row_idx: number) => (
                 <RowComponent unique={'line_' + row_idx}>
                     {row.map((square: Instance<typeof Square>, square_idx: number) => (
                         <SquareComponent

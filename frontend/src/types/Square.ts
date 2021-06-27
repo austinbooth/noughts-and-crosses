@@ -2,7 +2,7 @@ import { Instance } from "mobx-state-tree"
 import { store, getAllEmptySquares } from './store'
 import { SquareBase, SquareValues } from '../common/Square'
 import { check3 } from '../util/check3'
-import { Rows } from '../common'
+import { Rows } from './index'
 
 export const get_rows = (board: Rows) => {
   const rows: SquareValues[][] = []
@@ -89,4 +89,4 @@ export const Square = SquareBase
       self.value = SquareValues.null
     }
   }))
-export type Square = Instance<typeof Square>
+export type Square = typeof Square
