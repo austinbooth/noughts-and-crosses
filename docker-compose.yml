@@ -10,7 +10,7 @@ services:
     volumes:
       - "./frontend:/noc"
       - "/noc/node_modules"
-      - "./common:/noc/common"
+      - "./common:/noc/src/common"
     ports:
       - "8080:3000"
   server:

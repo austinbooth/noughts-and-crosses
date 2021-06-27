@@ -1,5 +1,5 @@
 import { store } from '../types/store'
-import { GameType } from '../../common/index'
+import { GameType } from '../common/index'
 
 export const GameSelector = () => {
     const { set_game_type } = store

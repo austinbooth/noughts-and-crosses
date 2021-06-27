@@ -1,6 +1,7 @@
 import { types, applySnapshot } from "mobx-state-tree"
-import { Row, Rows, Turn, GameType, Winner } from '../../common/index'
-import { SquareValues, Square, check_if_won } from '../../common/Square'
+import { Row, Rows, Turn, GameType, Winner, Game } from '../common'
+import { SquareValues } from '../common/Square'
+import { Square, check_if_won } from '../types/Square'
 
 const randomInt = (max: number) => Math.floor(Math.random() * max)
 
@@ -121,15 +122,10 @@ const random_move = () => {
   square.add_value(store.turn === Turn.player1 ? SquareValues.X : SquareValues.O)
 }
 
-const RootStore = types
-  .model({
-    board: Rows,
-    turn: types.maybeNull(types.enumeration<Turn>(Object.values(Turn))),
-    game_in_play: false,
-    winner: types.maybeNull(types.enumeration<Winner>(Object.values(Winner))),
-    game_type: GameType.COMPUTER_DUMB,
-    player1: types.maybeNull(types.string),
-    player2: types.maybeNull(types.string)
+const RootStore = Game
+  .named('StoreFrontend')
+  .props({
+    game_type: GameType.COMPUTER_DUMB
   })
   .actions(self => ({
     create_board: (side_length: number, new_board:string[][] = []) => {

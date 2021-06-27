@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { SquareValues } from '../types/Square'
+import { SquareValues } from '../common/Square'
 import styled from 'styled-components'
 
 const SquareContainer = styled.div`
