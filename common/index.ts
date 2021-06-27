@@ -1,5 +1,5 @@
 import { types, Instance } from "mobx-state-tree"
-import { Square } from '../types/Square'
+import { SquareBase } from './Square'
   
 export enum Turn {
     player1 = 'player1',
@@ -12,7 +12,7 @@ export enum Winner {
     tie = 'tie'
 }
   
-export const Row = types.array(Square)
+export const Row = types.array(SquareBase)
   
 export const Rows = types.array(Row)
 export type Rows = Instance<typeof Rows>
@@ -29,3 +29,4 @@ export const Game = types.model({
     player1: types.maybeNull(types.string),
     player2: types.maybeNull(types.string)
 })
+export type Game = typeof Game
