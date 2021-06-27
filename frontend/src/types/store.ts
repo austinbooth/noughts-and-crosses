@@ -23,7 +23,7 @@ const minimax = (board: Rows, depth: number, maximisingPlayer: boolean, alpha: n
     const score = scoreLookup[gameResult]
     return score
   }
-  if (depth === 4) return 0 // so recursion doesn't take a very long time
+  if (depth === 5) return 0 // so recursion doesn't take a very long time
   const emptySquares: Instance<Square>[] = getAllEmptySquares(board)
   let bestScore = maximisingPlayer ? -Infinity : Infinity
   if (maximisingPlayer) {
