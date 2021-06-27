@@ -9,4 +9,5 @@ export type Rows = Instance<typeof Rows>
 
 export enum GameType {
     COMPUTER_DUMB = 'COMPUTER_DUMB',
+    TWO_PLAYER = 'TWO_PLAYER'
 }
