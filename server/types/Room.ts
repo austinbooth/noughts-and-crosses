@@ -1,11 +1,12 @@
 import { types } from 'mobx-state-tree'
 import { Game } from '../types'
+import { v4 as uuidv4 } from 'uuid'
 
 export const Room = types.model({
-    id: types.string,
+    uid: uuidv4(),
     user_1: types.string,
     user_2: types.maybe(types.string),
-    connection_code: Date.now().toString().substr(-4),
+    connection_code: Math.floor(Date.now() * Math.random()).toString().substr(-6),
     game: Game
 }).actions(self => ({
     set_user_2: (user_id: string) => {
